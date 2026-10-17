@@ -239,8 +239,24 @@ WebGLRenderingContext.prototype.renderRect = function (x,y,width,height=width,e=
 	return ptr;
 }
 
+
+WebGLRenderingContext.prototype.imgList = {
+	list : new Array(10),
+	pointer : 1,
+	need(n) {                                                                                    
+		if (this.pointer + n > this.list.length){
+			const bigger = new Float32Array(this.list.length*2);
+                        bigger.set(this.list);  
+			this.list = bigger; 
+		}
+        }
+}
+
 WebGLRenderingContext.prototype.getImg = function(src,idx=0,flipIdx) {
 	if (typeof idx != 'object') {idx = [idx];}
+	this.imgList.need(1);
+	const imgpointer = this.imgList.pointer;
+	this.imgList.pointer++;
 	const mainData = new Float32Array(30*idx.length);
 	for(let i = 0;i<(idx.length||1);i++) {
 		const txtidx = src[0]+1;
@@ -284,12 +300,14 @@ WebGLRenderingContext.prototype.getImg = function(src,idx=0,flipIdx) {
 		}
 		mainData.set(E,i*30);
 	}
-	return mainData;
+	this.imgList.list[imgpointer] = mainData;
+	return imgpointer;
 }
 
 WebGLRenderingContext.prototype.millsecond = 0;
 
-WebGLRenderingContext.prototype.renderImg = function(ptr,data,fps=12) {
+WebGLRenderingContext.prototype.renderImg = function(ptr,imgPtr,fps=12) {
+	const data = this.imgList.list[imgPtr];
         const shaderData = dataGL.bigShaderData;
 	const idx = Math.floor(this.millsecond/1000*fps)%(data.length/30);
 	const i = idx*30;
@@ -387,6 +405,7 @@ WebGLRenderingContext.prototype.initLib = function() {
 
 }
 
+
 WebGLRenderingContext.prototype.initTexture = function (url,horizontSlots=1,vertikalSlots=1) {
 	const textUnit = dataGL.textPtr;
 	dataGL.textPtr++;
@@ -415,6 +434,14 @@ WebGLRenderingContext.prototype.initTexture = function (url,horizontSlots=1,vert
 	return new Float32Array([textUnit,horizontSlots,vertikalSlots]);
 }
 
+const bgClr = new Float32Array([0.1,0.1,0.1,1.0]);
+WebGLRenderingContext.prototype.body={
+	style : {
+		_color: bgClr,
+		get color() {return this._color;},
+		set color(c) {this._color=c;bgClr.set(c,0);}
+	}
+}
 WebGLRenderingContext.prototype.draw = function() {
         /* Buat hanya menggambar shaderData sampai pointer  */ 
 	this.enable(this.BLEND);
@@ -427,12 +454,11 @@ WebGLRenderingContext.prototype.draw = function() {
         this.vertexAttribPointer(dataGL.aTextureIdx,1,this.FLOAT,false,dataGL.STRIDE,6*dataGL.FSIZE);
         this.enableVertexAttribArray(dataGL.aTextureIdx);
         
-        this.clearColor(0.1,0.1,0.1,1.0);
+        this.clearColor(bgClr[0],bgClr[1],bgClr[2],bgClr[3]);
         this.clear(this.COLOR_BUFFER_BIT);    
 	this.bufferData(this.ARRAY_BUFFER, dataGL.bigShaderData.subarray(0,
                 dataGL.pointer),this.DYNAMIC_DRAW);
         this.drawArrays(this.TRIANGLES, 0, dataGL.pointer / 7);
 }
 
-                                                                                
-
+                                                                            
