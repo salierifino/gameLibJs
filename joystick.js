@@ -2,7 +2,7 @@
 import {element} from './element.js'
 
 export const joystick = {
-	list: new Float32Array(8*5),
+	list: new Float32Array(9*5),
 	pointer : 0,
 	touchptr : 0,
 	stylels : new Float32Array([
@@ -23,27 +23,28 @@ WebGLRenderingContext.prototype.createElement = function(type) {
 	const ctx = createElementAsli && createElementAsli.call(this, type);
 	if (type != 'joystick') return ctx;
 	const idx = joystick.pointer;
-	if (idx == 40) { /* 40 = 8x5 */
+	if (idx == 45) { /* 45 = 9x5, 9 itu x,y,size, xdalam, ydalam, sizedalam,
+			pointer idx, attach id,sudut */
 		console.error("Jumlah maksimum Joystick adalah 5");
 		return -1;
 		/* Saya tidak membuat alokasi jika melebihi maks
 		 * karena joystick tidak perlu banyak-banyak */
 	}
 	if (idx == 0) { /* Jika belum ada joystick, taruh pojok kiri atas*/
-		joystick.list.set(new Float32Array([75,75,60,75,75,30,0,0]),idx);
+		joystick.list.set(new Float32Array([75,75,60,75,75,30,0,0,0]),idx);
 
 	/* Jika sudah ada taruh sebelah kanan nya
 		 * Jika sudah mentok kanan, taruh bawahnya*/
-	} else if (joystick.list[idx-8] + 200 >= this.canvas.width) {
-		const y = joystick.list[idx-7] + 150
-		joystick.list.set(new Float32Array([75,y,60,75,y,30,0,0]),idx);
+	} else if (joystick.list[idx-9] + 200 >= this.canvas.width) {
+		const y = joystick.list[idx-8] + 150
+		joystick.list.set(new Float32Array([75,y,60,75,y,30,0,0,0]),idx);
 	} else { /* jika belum mentok */
-		const x = joystick.list[idx-8] + 150;
-		const y = joystick.list[idx-7];
-		joystick.list.set(new Float32Array([x,y,60,x,y,30,0,0]),idx);
+		const x = joystick.list[idx-9] + 150;
+		const y = joystick.list[idx-8];
+		joystick.list.set(new Float32Array([x,y,60,x,y,30,0,0,0]),idx);
 	}
-	joystick.pointer += 8;
-	const idx2 = idx/8*13;
+	joystick.pointer += 9;
+	const idx2 = idx/9*13;
 	
 	return {
 		style : {
@@ -78,7 +79,17 @@ WebGLRenderingContext.prototype.createElement = function(type) {
 		},
 		_attach : 0,
 		get attach() {return this._attach;},
-		set attach(el) {el = el.id+20;this._attach=el;joystick.list[idx+7]=el;}
+		set attach(el) {
+			el = el.id+20;
+			this._attach=el;
+			joystick.list[idx+7]=el;
+		},
+		_rotatable : false,
+		get rotatable() {return this._rotatable;},
+		set rotatable(rot) {
+			const rotatable = (joystick.list[idx+8] >= 180)*360;
+			joystick.list[idx+8] = (joystick.list[idx+8] -= rotatable) + rot*360;
+		}
 	}
 }
 WebGLRenderingContext.prototype.checkJoystick = function() {
@@ -93,11 +104,11 @@ WebGLRenderingContext.prototype.checkJoystick = function() {
 			const x = touch.clientX - rleft;
 			const y = touch.clientY - rtop;
 			for(let i=0;i<5;i++){
-				const xc = joystick.list[i*8+3];
-				const yc = joystick.list[i*8+4];
-				const r = joystick.list[i*8+5];
+				const xc = joystick.list[i*9+3];
+				const yc = joystick.list[i*9+4];
+				const r = joystick.list[i*9+5];
 				if ((x-xc)**2 + (y-yc)**2 < r*r) {
-					joystick.list[i*8+6] = touch.identifier+1; /* 0:tak aktif */
+					joystick.list[i*9+6] = touch.identifier+1; /* 0:tak aktif */
 					break; /*1 touch cukup*/
 				}
 			}
@@ -113,10 +124,10 @@ WebGLRenderingContext.prototype.checkJoystick = function() {
 
 			for(let i=0;i<5;i++){
 				/* Jika joystick dipencet*/
-				if(joystick.list[i*8+6] == touch.identifier+1){
-					const ox = joystick.list[i*8];
-					const oy = joystick.list[i*8+1];
-					const br = joystick.list[i*8+2]; /* batas radius */
+				if(joystick.list[i*9+6] == touch.identifier+1){
+					const ox = joystick.list[i*9];
+					const oy = joystick.list[i*9+1];
+					const br = joystick.list[i*9+2]; /* batas radius */
 					/* jarak jari ke pusat */
 					let dx = x - ox; /* jarak x */
 					let dy = y - oy; /* jarak y */
@@ -134,10 +145,10 @@ WebGLRenderingContext.prototype.checkJoystick = function() {
 					 * maka bola ada di batas maksimal.*/
 
 					dx = dx*over + batasX*(1-over);
-					joystick.list[i*8+3] = ox + dx;
+					joystick.list[i*9+3] = ox + dx;
 
 					dy = dy*over + batasY*(1-over);
-					joystick.list[i*8+4] = oy + dy;
+					joystick.list[i*9+4] = oy + dy;
 				}
 			}
 		}
@@ -149,14 +160,14 @@ WebGLRenderingContext.prototype.checkJoystick = function() {
 			for(let i=0;i<5;i++){
 				/* Jika yang dilepas adalah loop sekarang, isMe = 1, else 0
 				 * maka semua kembali ke pusat, dan index sentuhan menjadi 0*/
-				const isMe = (joystick.list[i*8+6] == 
+				const isMe = (joystick.list[i*9+6] == 
 					e.changedTouches[t].identifier+1) * 1;
 
-				joystick.list[i*8+3] = joystick.list[i*8]*isMe+
-					joystick.list[i*8+3]*(1-isMe);
-				joystick.list[i*8+4] = joystick.list[i*8+1]*isMe+
-					joystick.list[i*8+4]*(1-isMe);
-				joystick.list[i*8+6] = joystick.list[i*8+6]*(1-isMe);
+				joystick.list[i*9+3] = joystick.list[i*9]*isMe+
+					joystick.list[i*9+3]*(1-isMe);
+				joystick.list[i*9+4] = joystick.list[i*9+1]*isMe+
+					joystick.list[i*9+4]*(1-isMe);
+				joystick.list[i*9+6] = joystick.list[i*9+6]*(1-isMe);
 			}
 		}
     };
@@ -166,7 +177,7 @@ WebGLRenderingContext.prototype.checkJoystick = function() {
 
 
 WebGLRenderingContext.prototype.loopJoystick = function(idx) {
-	const satuJoy = joystick.list.subarray(idx*8,(idx+1)*8);
+	const satuJoy = joystick.list.subarray(idx*9,(idx+1)*9);
         const satuStyle = joystick.stylels.subarray(idx*13,(idx+1)*13);
 
 	const xcover = satuJoy[0];
@@ -176,11 +187,18 @@ WebGLRenderingContext.prototype.loopJoystick = function(idx) {
 	const bind = satuJoy[7];
 	const dx = satuJoy[3] - xcover;
 	const dy = satuJoy[4] - ycover;
-	element.list[bind-19] += dx*0.1;
-	element.list[bind-18] += dy*0.1;
-	let sudut = Math.atan2(dy,dx)*57.29578;
-	element.list[bind-15] = (sudut != -180.00003724215995)*sudut || 
-		element.list[bind-15]; /*Jika dilepas, 
+	const i = bind-20;
+	element.list[i+1] += dx*0.03*element.list[i+18];
+	element.list[i+2] += dy*0.03*element.list[i+19];
+
+	const rotatable = (satuJoy[8]>=180)*1;
+	const rotateVal = rotatable*360; /*jika bener, nilainya 360*/
+	/*Boolean + Sudut*/
+	joystick.list[i+8] = rotateVal + Math.atan2(dy,dx)*57.29578;
+	const sudut = joystick.list[i+8] - rotateVal;
+
+	element.list[bind-15] = ((sudut != -180.00003724215995)*sudut || 
+		element.list[bind-15])*rotatable; /*Jika dilepas, 
 		sudut tidak langsung kenbali*/
 
 	/*render*/
