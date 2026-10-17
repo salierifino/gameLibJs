@@ -1,6 +1,7 @@
-import * as element from './element.js'
+import {element} from './element.js'
 import * as webgl from './drawGL.js'
 import * as joystick from './joystick.js'
+
 /*======*/
 
 window.rgba = function(r,g,b,a=1.0) {
@@ -31,7 +32,7 @@ WebGLRenderingContext.prototype.loop = function(now){
                 this.reset();
                 window.update && window.update();
                 waktuTertinggal -= satuFrame;
-		const elCount = element.element.pointer/10;
+		const elCount = element.pointer/10;
 		for (let i=0;i<elCount;i++) {
 			this.renderElement(i);
 		}
@@ -65,7 +66,7 @@ HTMLCanvasElement.prototype.getContext = function(type, ...args) {
 	return ctx;
 };
 
-/* awokwok */
+/* bisa langsung dipanggil dengan update(fungsi) */
 window.update = (fn) => {
   if(typeof fn === 'function') window.update = fn;
 };
