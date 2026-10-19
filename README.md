@@ -37,8 +37,11 @@ import * as gllib from './GLlib.js'
 Setelah itu, sudah dapat digunakan.  
 Keuntungan cara ini adalah, adanya kemudahan untuk memodifikasi library ini, seperti jika tidak ingin menggunakan joystick, dapat menghapus sintaks *import joystick.js* pada *GLlib.js*
 
-**Cara Online**
-
+**Cara Online**  
+Tanpa unduh apa-apa :
+```html
+<script src="https://cdn.jsdelivr.net/gh/salierifino/gameLibJs@main/allGLlib.js"></script> 
+```
 ## 2. Dokumentasi Penggunaan 
 **Deklarasi context**
 ```javascript
