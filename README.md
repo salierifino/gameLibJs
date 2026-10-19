@@ -64,7 +64,9 @@ const merah = rgba(255,0,0);
 //5 Parameter: x,y,w,h,warna
 gl.renderRect(40,70,50,70,merah);
 // 6 Parameter: x,y,w,h,derajat kemiringan, warna
-// 8 Parameter : x,y,w,h,derajat kemiringan, titik poros X, titik poros Y, warna
+/* 8 Parameter : x,y,w,h,derajat kemiringan,
+titik poros X, titik poros Y, warna  
+*/
 /*
 Titik poros itu adalah poros ketika kemiringan persegi diputar,  
 di mana jika isinya 0, maka titiknya ada diujung kiri/atas,  
@@ -78,3 +80,55 @@ gl.renderCircle(40,70,50,merah);
 // Ring : x,y,r dalam, ketebalan, warna
 gl.renderRing(40,70,50,10,merah);
 ```
+
+**Membuat Element**  
+Ini hanya dideklarasikan sekali di luar perulangan.  
+```javascript
+const kotak1 = gl.createElement("rectangle");
+const bulat1 = gl.createElement("circle");
+
+// Mengubah properti, mirip seperti css
+kotak1.style.width = 500;
+kotak1.style.color = rgba(220,56,0,1);
+
+
+// Event Listener
+kotak1.addEventListener("pointerup",()=> {
+// Fungsi yang dijalankan sekali jika kotak dilepas
+});
+//Hanya aja click, pointerup, dan pointerdown
+```
+
+**Texture**  
+```javascript
+const sumbergambar1 = gl.initTexture("gambar.png",2,2);
+// Params : url, banyak gambar di mendatar(horizontal), banyak gambar menurun(vertikal)
+const gambar1 = gl.getImg(sumbergambar1,1,0)
+// gambar, index, dan refleksi
+/*
+Kalau 0, Tidak terbalik.  
+Kalau 1, terbalik horizontal.  
+Kalau 2, terbalik vertikal.
+
+index bisa berbentuk array jika  
+yang dibuat adalah animasi, contoh [0,1,2,3]
+*/
+
+// Pakai
+kotak1.src = gambar1;
+
+// Atau jika Langsung gambar :
+update(()=> {
+const kotakan2 = gl.renderRect(200,200,30,50);
+// Timpa 
+gl.renderImg(kotakan2, gambar1,1)
+// kotak yg ditimpa, gambar, fps jika animasi
+});
+
+
+```
+
+## 3. Target
+1. Rewrite beberapa fungsi ke WebAssembly
+2. Mendukung API web Audio, baik file audio maupun audio sintesis.
+3. Mendukung pembuatan game 3D
