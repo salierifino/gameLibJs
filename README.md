@@ -66,7 +66,11 @@ gl.renderRect(40,70,50,70,merah);
 // 6 Parameter: x,y,w,h,derajat kemiringan, warna
 // 8 Parameter : x,y,w,h,derajat kemiringan, titik poros X, titik poros Y, warna
 /*
-Titik poros itu adalah poros ketika kemiringan persegi diputar, di mana jika isinya 0, maka titiknya ada diujung kiri/atas, jika isinya 100, maka titiknya ada di kanan/bawah, dan jika isinya 50 atau diantara 0-100, maka titik poros ada di tengah tengah
+Titik poros itu adalah poros ketika kemiringan persegi diputar,  
+di mana jika isinya 0, maka titiknya ada diujung kiri/atas,  
+jika isinya 100, maka titiknya ada di kanan/bawah,
+dan jika isinya 50 atau diantara 0-100,
+maka titik poros ada di tengah-tengah
 */
 
 // Circle : x,y,r, warna 
