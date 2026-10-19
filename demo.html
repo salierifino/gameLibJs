@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Game Ular GLlib.js</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            touch-action: none;
+        }
+        #gameCanvas {
+            background-color: #2c3e50;
+            border: 4px solid #ecf0f1;
+            border-radius: 8px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+        .ui {
+            position: absolute;
+            top: 15px;
+            font-size: 20px;
+            font-weight: bold;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+<script src="//cdn.jsdelivr.net/npm/eruda"></script> <script>eruda.init();</script>
+    <div class="ui">Skor: <span id="skor">0</span> | Panjang: <span id="panjang">3</span></div>
+    <canvas id="gameCanvas" width="400" height="600"></canvas>
+<script src="https://cdn.jsdelivr.net/gh/salierifino/gameLibJs@main/allGLlib.js"></script> 
+<script src="https://cdn.jsdelivr.net/gh/salierifino/gameLibJs@main/alert.js"></script>
+    <script>
+	    const canvas = document.getElementById('gameCanvas');
+	    const gl = canvas.getContext('webgl');
+	
+	    gl.body.style.color = rgba(0,255,255);
+	    let skor = 0;
+	    let gameAktif = true;
+	    let tailLength = 3;
+	    let historyPos = [];
+	
+	    let musuhSpeedX = 3;
+	    // 1. Kepala Ular
+	    const snakeHead = gl.createElement('circle');
+	    snakeHead.style.left = 200;
+	    snakeHead.style.top = 300;
+	    snakeHead.style.size = 30;
+	    snakeHead.style.color = rgba(46, 204, 113, 1);
+	    snakeHead.setAttribute("velocityX",3);
+	    snakeHead.setAttribute("velocityY",3);
+	
+	    // 2. Koin
+	    const koin = gl.createElement('circle');
+	    koin.style.left = 100;
+	    koin.style.top = 150;
+	    koin.style.size = 24;
+	    koin.style.color = rgba(241, 196, 15, 1);
+	
+	    // 3. Musuh
+	    const musuh = gl.createElement('rectangle');
+	    musuh.style.left = 200;
+	    musuh.style.top = 200;
+	    musuh.style.width = 70;
+	    musuh.style.height = 30;
+	    musuh.style.color = rgba(231, 76, 60, 1);
+	
+	    // 4. Joystick
+	    const joy = gl.createElement('joystick');
+	    joy.style.left = 80;
+	    joy.style.top = 500;
+	    joy.style.size = 80;
+	    joy.style.color = rgba(52, 152, 219, 0.9); // Dalam
+	    joy.style.backgroundColor = rgba(44, 62, 80, 0.5);//luar
+	    joy.style.padding = 10;
+	    joy.style.border = 3;    
+	    joy.style.borderColor = rgba(236, 240, 241, 0.8);//border
+	    
+	    joy.attach = snakeHead; // Mebghubungkan pergerakan
+	
+  
+
+	    function acakKoin() {
+		    koin.style.left = Math.random() *
+			    (canvas.width - 60) + 30;
+		    koin.style.top = Math.random() * 
+			    (canvas.height - 200) + 30;
+	    }
+
+	    function gameOver(pesan) {
+		    gameAktif = false;
+		    setTimeout( () => {
+			    customAlert("Game Over! " + pesan + "\nSkor: " + skor);
+			    setTimeout( () => {
+			    location.reload();
+		        }, 1000);
+		    }, 100);
+	    }
+
+	    // 5. Game Loop
+	    update(() => {
+		    if (!gameAktif) return;
+
+	            let headX = snakeHead.style.left;
+	            let headY = snakeHead.style.top;
+	            let headR = snakeHead.style.size / 2;
+	
+	            // Pergerakan Musuh
+	            let musuhX = musuh.style.left;
+	            let musuhW = musuh.style.width;
+	            let newMusuhX = musuhX + musuhSpeedX;
+	            if (newMusuhX - musuhW/2 < 10 ||
+			    newMusuhX + musuhW/2 > canvas.width - 10) {
+	                musuhSpeedX *= -1;
+	            } else {
+	                musuh.style.left = newMusuhX;
+	            }
+	            musuh.style.rotate = (musuh.style.rotate + 3) % 360;
+
+		    for (let j=0; j<snakeHead.getAttribute("velocityY");j++) {
+
+			    // Rekam Jejak Ekor
+			    historyPos.unshift({ x: headX, y: headY });
+			    let spacing = 6;
+			    let maxLen = tailLength * spacing + 10;
+			    if (historyPos.length > maxLen) {
+				    historyPos.pop();
+			    }
+	
+			    for (let i = 1; i <= tailLength; i++) {
+				    let index = i * spacing;
+				    if (historyPos[index]) {
+	
+					    // Panggil renderCircle langsung
+					    let segX = historyPos[index].x;
+					    let segY = historyPos[index].y;
+					    gl.renderCircle(segX+7, segY,
+						    headR * 0.8, rgba(39, 174, 96, 1));
+		
+					    // Cek tabrakan ekor sendiri
+					    if (i > 3) {
+						    let dist = Math.hypot(
+							    headX - segX, headY - segY);
+						    if (dist < headR) {
+							    gameOver("Ular menabrak ekornya sendiri!");
+							    return;
+						    }
+					    }
+				    }
+			    }
+		    }
+	
+		    // Cek Koin
+		    if (gl.isCollision(snakeHead.id, koin.id)) {
+			    skor += 10;
+			    tailLength += 2;
+			    document.getElementById('skor').innerText = skor;
+			    document.getElementById('panjang').innerText = tailLength;
+			    acakKoin();
+		    }
+
+		    // Cek Musuh
+		    if (gl.isCollision(snakeHead.id, musuh.id)) {
+			    gameOver("Ular menabrak musuh!");
+		    }
+	    });
+    </script>
+</body>
+</html>
