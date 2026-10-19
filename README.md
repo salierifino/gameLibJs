@@ -10,10 +10,30 @@ GLlib.js : Menggabungkan library drawGL, element, dan joystick menjadi satu, dan
 allGLlib.js : Gabungan dari semua Library yang terpisah menjadi satu file besar. Dan tidak bersifat module.
 
 ## 1. Cara menggunakan
-Ada dua cara untuk menggunakan library ini, yaitu cara klasik, dan cara modern/module.
+Ada tiga cara untuk menggunakan library ini, yaitu cara klasik, cara modern/module, dan cara daring/*online*.
 
 **Cara klasik**
-Menambahkan seperti ini pada file html:
+Unduh file *allGLlib.js*, kemudian tambahkan seperti ini pada file html:
 ```html
 <script src="allGLlib.js"><script>
 ```
+Kemudian sudah dapat digunakan.  
+Keunggulan cara ini adalah mudah, dan hanya perlu menginstal satu file saja. Tapi akan ada kesulitan jika ingin memodifikasi library.
+
+**Cara Modern/Online**
+Unduh semua file-file yang dibutuhkan seperti :
+- GLlib.js
+- element.js
+- drawGL.js
+- joystick.js
+dalam satu folder yang sama dengan folder *index.html* dan *script.js* milik Anda.
+Kemudian tambahkan pada file javascript seperti ini di paling atas :
+```javascript
+import * as gllib from './GLlib.js'
+```
+Setelah itu, sudah dapat digunakan.  
+Keuntungan cara ini adalah, adanya kemudahan untuk memodifikasi library ini, seperti jika tidak ingin menggunakan joystick, dapat menghapus sintaks *import joystick.js* pada *GLlib.js*
+
+**Cara Online**
+
+## 2.
