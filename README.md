@@ -40,4 +40,37 @@ Keuntungan cara ini adalah, adanya kemudahan untuk memodifikasi library ini, sep
 **Cara Online**
 
 ## 2. Dokumentasi Penggunaan 
-**Cara 
+**Deklarasi context**
+```javascript
+const canvas = document.getElementById('gameCanvas');
+const gl = canvas.getContext('webgl');
+```
+**Mengubah warna latar belakang**
+```javascript
+gl.body.style.color = rgba(0,255,255);
+```
+**Membuat perulangan**
+```javascript
+update(()=> {
+ // Sintaks dalam perulangan
+});
+```
+**Menggambar bentuk dasar**
+Ini harus diletakkan dalam perulangan. 
+```javascript
+// Bikin warna
+const merah = rgba(255,0,0);
+//Rectangle
+//5 Parameter: x,y,w,h,warna
+gl.renderRect(40,70,50,70,merah);
+// 6 Parameter: x,y,w,h,derajat kemiringan, warna
+// 8 Parameter : x,y,w,h,derajat kemiringan, titik poros X, titik poros Y, warna
+/*
+Titik poros itu adalah poros ketika kemiringan persegi diputar, di mana jika isinya 0, maka titiknya ada diujung kiri/atas, jika isinya 100, maka titiknya ada di kanan/bawah, dan jika isinya 50 atau diantara 0-100, maka titik poros ada di tengah tengah
+*/
+
+// Circle : x,y,r, warna 
+gl.renderCircle(40,70,50,merah);
+// Ring : x,y,r dalam, ketebalan, warna
+gl.renderRing(40,70,50,10,merah);
+```
