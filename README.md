@@ -25,8 +25,11 @@ Unduh semua file-file yang dibutuhkan seperti :
 - GLlib.js
 - element.js
 - drawGL.js
-- joystick.js
-dalam satu folder yang sama dengan folder *index.html* dan *script.js* milik Anda.
+- joystick.js  
+dalam satu folder yang sama dengan folder *index.html* dan *script.js* milik Anda. Pastikan *script.js* dipanggil dalam bentuk module.
+```html
+<script type="module src="script.js"></script>
+```
 Kemudian tambahkan pada file javascript seperti ini di paling atas :
 ```javascript
 import * as gllib from './GLlib.js'
@@ -37,3 +40,4 @@ Keuntungan cara ini adalah, adanya kemudahan untuk memodifikasi library ini, sep
 **Cara Online**
 
 ## 2. Dokumentasi Penggunaan 
+**Cara 
